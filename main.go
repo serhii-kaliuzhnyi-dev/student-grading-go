@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/csv"
+	"fmt"
 	"os"
 	"strconv"
 )
@@ -24,6 +25,12 @@ type studentStat struct {
 	student
 	finalScore float32
 	grade      Grade
+}
+
+func (s student) String() string {
+    return fmt.Sprintf("%s %s from %s (Test Scores: %d, %d, %d, %d)", 
+                       s.firstName, s.lastName, s.university, 
+                       s.test1Score, s.test2Score, s.test3Score, s.test4Score)
 }
 
 func parseCSV(filePath string) []student {
@@ -122,15 +129,18 @@ func findOverallTopper(gradedStudents []studentStat) studentStat {
 }
 
 func findTopperPerUniversity(gradedStudents []studentStat) map[string]studentStat {
+	universityGroups := make(map[string][]studentStat)
+
+	// Group students by university
+	for _, s := range gradedStudents {
+			universityGroups[s.university] = append(universityGroups[s.university], s)
+	}
+
 	toppers := make(map[string]studentStat)
 
-	for _, s := range gradedStudents {
-		// Check if the university already has a topper
-		top, exists := toppers[s.university]
-		if !exists || s.finalScore > top.finalScore {
-			// Update the topper for the university if the current student has a higher score
-			toppers[s.university] = s
-		}
+	// Find the topper for each university using findOverallTopper
+	for university, students := range universityGroups {
+			toppers[university] = findOverallTopper(students)
 	}
 
 	return toppers

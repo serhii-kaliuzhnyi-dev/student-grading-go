@@ -60,3 +60,22 @@ func TestFindTopperPerUniversity(t *testing.T) {
 	a.Equal(calTopper, tpu["University of California"].student, "University of California topper should be Karina, but got %v", tpu["University of California"].firstName)
 	a.Equal(floTopper, tpu["University of Florida"].student, "University of Florida topper should be Nathan, but got %v", tpu["University of Florida"].firstName)
 }
+
+func TestFindTopperPerUniversity_ZeroStudents(t *testing.T) {
+    a := assert.New(t)
+    students := []studentStat{}
+    result := findTopperPerUniversity(students)
+
+    a.Equal(0, len(result), "Expected no toppers, but got %d", len(result))
+}
+
+func TestFindTopperPerUniversity_OneStudent(t *testing.T) {
+    a := assert.New(t)
+    students := []studentStat{
+        {student: student{firstName: "John", university: "Harvard"}, finalScore: 85, grade: A},
+    }
+    result := findTopperPerUniversity(students)
+
+    a.Equal(1, len(result), "Expected 1 topper, but got %d", len(result))
+    a.Equal("John", result["Harvard"].firstName, "Expected John to be the topper, but got %v", result["Harvard"].firstName)
+}
